@@ -5,10 +5,14 @@ import { checkStock } from "./domain/validators/check-stock";
 import { OrderStatusEnum } from "./domain/enums/order-status.enum";
 import { PaymentStatusEnum } from "./domain/enums/payment-status.enum";
 import { PaymentMethodEnum } from "./domain/enums/payment-method.enum";
+import { EventsService } from "src/events/events.service";
 
 @Injectable()
 export class OrdersService {
-	constructor(private readonly prisma: PrismaService) {}
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly eventsService: EventsService,
+	) {}
 
 	async create(data: CreateOrderDTO) {
 		try {
@@ -26,27 +30,38 @@ export class OrdersService {
 				0,
 			);
 
-			const order = await this.prisma.order.create({
-				data: {
-					userId: data.userId,
-					total: totalPriceOrder,
-					statusId: OrderStatusEnum.PENDING,
-					orderItems: {
-						create: orderItemsWithPrice,
+			const { order, payment } = await this.prisma.$transaction(async (tx) => {
+				const order = await tx.order.create({
+					data: {
+						userId: data.userId,
+						total: totalPriceOrder,
+						statusId: OrderStatusEnum.PENDING,
+						orderItems: {
+							create: orderItemsWithPrice,
+						},
 					},
-				},
-				include: { orderItems: true },
+					include: { orderItems: true },
+				});
+
+				const payment = await tx.payment.create({
+					data: {
+						orderId: order.id,
+						amount: totalPriceOrder,
+						methodId: data.payment as PaymentMethodEnum,
+						statusId: PaymentStatusEnum.PENDING,
+					},
+				});
+
+				return { order, payment };
 			});
 
-			await this.prisma.payment.create({
-				data: {
-					orderId: order.id,
-					amount: totalPriceOrder,
-					methodId: data.payment as PaymentMethodEnum,
-					statusId: PaymentStatusEnum.PENDING,
-				},
-			});
-			//TODO: Stock update with RabbitMQ
+			await Promise.allSettled([
+				this.eventsService.emitStockEvent(order.orderItems),
+				this.eventsService.emitPaymentEvent({
+					orderId: payment.orderId,
+					status: PaymentStatusEnum.PAID,
+				}),
+			]);
 		} catch (error) {
 			throw new Error(error);
 		}

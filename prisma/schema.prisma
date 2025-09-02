@@ -96,26 +96,3 @@ model Payment {
   method    PaymentMethod @relation(fields: [methodId], references: [id])
   createdAt DateTime      @default(now())
 }
-
-model EventType {
-  id     Int        @id @default(autoincrement())
-  name   String     @unique
-  events EventLog[]
-}
-
-model EventStatus {
-  id     Int        @id @default(autoincrement())
-  name   String     @unique
-  events EventLog[]
-}
-
-model EventLog {
-  id          Int         @id @default(autoincrement())
-  typeId      Int
-  type        EventType   @relation(fields: [typeId], references: [id])
-  payload     String
-  statusId    Int
-  status      EventStatus @relation(fields: [statusId], references: [id])
-  createdAt   DateTime    @default(now())
-  processedAt DateTime?
-}
