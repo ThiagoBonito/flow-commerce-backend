@@ -64,6 +64,9 @@ npm install
 # Gerar cliente Prisma
 npx prisma generate
 
+# Se o banco estiver vazio, rode o seed
+npx prisma db seed
+
 # Rodar migrações SQLite (ou criar DB)
 npx prisma migrate dev
 
@@ -74,26 +77,11 @@ npm run start:dev
 npm run start:worker:stock
 npm run start:worker:payment
 
-## 🐳 Rodando com Docker
-
-Para facilitar o setup e isolamento, todo o backend pode ser executado via Docker. Os workers são containers separados e consomem apenas suas filas específicas.
-
-### 1️⃣ Build das imagens
-```bash
-# Aplicação principal
+### Rodar com Docker
 docker build -t flowcommerce-app:latest .
-
-# Worker de estoque
 docker build -t flowcommerce-stock:latest -f Dockerfile.stock.worker .
-
-# Worker de pagamento
 docker build -t flowcommerce-payment:latest -f Dockerfile.payment.worker .
-
-# Rodar containers
 docker-compose up -d
 
-
-### Rodando Testes
-
+### Rodar Testes
 npm run test
-
