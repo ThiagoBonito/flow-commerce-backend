@@ -1,4 +1,4 @@
-import { Product } from "generated/prisma";
+import { Product } from "@prisma/client";
 import { ItemDTO } from "src/orders/dto/create-order";
 
 export function checkStock(orderItems: ItemDTO[], products: Product[]) {
