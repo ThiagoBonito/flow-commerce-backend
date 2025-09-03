@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   nestjs-app:
-    build: .
+    image: flowcommerce-app:latest
     ports:
       - "3001:3000"
     volumes:
@@ -27,21 +27,21 @@ services:
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
 
   stock_worker:
-    build: .
+    image: flowcommerce-stock:latest
     env_file:
       - .env
     command: npm run start:worker:stock
     depends_on:
       - rabbitmq
     deploy:
-      replicas: 3
+      replicas: 1
 
   payment_worker:
-    build: .
+    image: flowcommerce-payment:latest
     env_file:
       - .env
     command: npm run start:worker:payment
     depends_on:
       - rabbitmq
     deploy:
-      replicas: 3
+      replicas: 1
