@@ -2,6 +2,9 @@ version: '3.9'
 services:
   nestjs-app:
     image: flowcommerce-app:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3001:3000"
     volumes:
@@ -26,22 +29,46 @@ services:
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
 
-  stock_worker:
+  stock_worker_1:
     image: flowcommerce-stock:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.stock.worker
     env_file:
       - .env
-    command: npm run start:worker:stock
+    command: npm run start:worker:stock:prod
     depends_on:
       - rabbitmq
-    deploy:
-      replicas: 2
 
-  payment_worker:
-    image: flowcommerce-payment:latest
+  stock_worker_2:
+    image: flowcommerce-stock:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.stock.worker
     env_file:
       - .env
-    command: npm run start:worker:payment
+    command: npm run start:worker:stock:prod
     depends_on:
       - rabbitmq
-    deploy:
-      replicas: 2
+
+  payment_worker_1:
+    image: flowcommerce-payment:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.payment.worker
+    env_file:
+      - .env
+    command: npm run start:worker:payment:prod
+    depends_on:
+      - rabbitmq
+
+  payment_worker_2:
+    image: flowcommerce-payment:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.payment.worker
+    env_file:
+      - .env
+    command: npm run start:worker:payment:prod
+    depends_on:
+      - rabbitmq
