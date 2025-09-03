@@ -34,7 +34,7 @@ services:
     depends_on:
       - rabbitmq
     deploy:
-      replicas: 1
+      replicas: 2
 
   payment_worker:
     image: flowcommerce-payment:latest
@@ -44,4 +44,4 @@ services:
     depends_on:
       - rabbitmq
     deploy:
-      replicas: 1
+      replicas: 2
