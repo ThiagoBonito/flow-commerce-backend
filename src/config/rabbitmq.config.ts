@@ -2,7 +2,7 @@ import { type ClientProviderOptions, Transport } from "@nestjs/microservices";
 
 export const rabbitMqConfig: ClientProviderOptions[] = [
 	{
-		name: "STOCKS_SERVICE",
+		name: "STOCK_SERVICE",
 		transport: Transport.RMQ,
 		options: {
 			urls: [process.env.RABBITMQ_URL || "amqp://localhost:5672"],
@@ -14,7 +14,7 @@ export const rabbitMqConfig: ClientProviderOptions[] = [
 		},
 	},
 	{
-		name: "PAYMENTS_SERVICE",
+		name: "PAYMENT_SERVICE",
 		transport: Transport.RMQ,
 		options: {
 			urls: [process.env.RABBITMQ_URL || "amqp://localhost:5672"],
