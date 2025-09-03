@@ -76,12 +76,17 @@ npm run start:dev
 # Rodar workers em terminais separados
 npm run start:worker:stock
 npm run start:worker:payment
+```
 
 ### Rodar com Docker
+```bash
 docker build -t flowcommerce-app:latest .
 docker build -t flowcommerce-stock:latest -f Dockerfile.stock.worker .
 docker build -t flowcommerce-payment:latest -f Dockerfile.payment.worker .
 docker-compose up -d
+```
 
 ### Rodar Testes
+```bash
 npm run test
+```
